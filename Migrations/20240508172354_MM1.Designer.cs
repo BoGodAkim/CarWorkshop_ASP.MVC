@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using CarWorkshop.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NpgsqlTypes;
 
 #nullable disable
 
 namespace CarWorkshop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508172354_MM1")]
+    partial class MM1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,14 +148,14 @@ namespace CarWorkshop.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
 
+                    b.Property<double>("Hours")
+                        .HasColumnType("double precision");
+
                     b.Property<double>("PricePerHour")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
-
-                    b.Property<NpgsqlRange<DateTime>>("WorkTime")
-                        .HasColumnType("tstzrange");
 
                     b.HasKey("Id");
 
@@ -200,12 +202,13 @@ namespace CarWorkshop.Migrations
                             b1.IsRequired();
 
                             b1.Property<string>("Description")
+                                .IsRequired()
                                 .HasColumnType("text");
 
                             b1.Property<bool>("IsApproved")
                                 .HasColumnType("boolean");
 
-                            b1.Property<double?>("Price")
+                            b1.Property<double>("Price")
                                 .HasColumnType("double precision");
                         });
 

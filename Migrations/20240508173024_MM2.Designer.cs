@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using CarWorkshop.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NpgsqlTypes;
 
 #nullable disable
 
 namespace CarWorkshop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508173024_MM2")]
+    partial class MM2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,14 +148,14 @@ namespace CarWorkshop.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
 
+                    b.Property<double>("Hours")
+                        .HasColumnType("double precision");
+
                     b.Property<double>("PricePerHour")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
-
-                    b.Property<NpgsqlRange<DateTime>>("WorkTime")
-                        .HasColumnType("tstzrange");
 
                     b.HasKey("Id");
 
@@ -202,7 +204,7 @@ namespace CarWorkshop.Migrations
                             b1.Property<string>("Description")
                                 .HasColumnType("text");
 
-                            b1.Property<bool>("IsApproved")
+                            b1.Property<bool?>("IsApproved")
                                 .HasColumnType("boolean");
 
                             b1.Property<double?>("Price")

@@ -1,8 +1,6 @@
-using System;
 using Microsoft.AspNetCore.Identity;
 
-
-namespace CarWorkshop.Areas.Identity.Data;
+namespace CarWorkshop.Models;
 
 
 public class ApplicationUser : IdentityUser<Guid>
@@ -25,6 +23,8 @@ public class ApplicationUser : IdentityUser<Guid>
 
     [PersonalData]
     public double? HourlyRate { get; set; }
+
+    public required ICollection<TaskModel> Tasks { get; set; }
 
 }
 

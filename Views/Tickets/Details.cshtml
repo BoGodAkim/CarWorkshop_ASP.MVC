@@ -1,0 +1,190 @@
+@model CarWorkshop.Models.TicketModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Ticket</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CarBrand)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CarBrand)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CarModel)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CarModel)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Year)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Year)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LicensePlate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LicensePlate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PaidAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PaidAmount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TicketStatus)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TicketStatus)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Estimation.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Estimation.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Estimation.Price)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Estimation.Price)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Estimation.IsApproved)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Estimation.IsApproved)
+        </dd>
+    </dl>
+    <h4>Parts</h4>
+    <hr />
+    <p>
+        <a asp-action="Create" asp-controller="Parts" asp-route-ticketId="@Model.Id">Add Part</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Parts.First<CarWorkshop.Models.PartModel>().Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Parts.First<CarWorkshop.Models.PartModel>().Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Parts.First<CarWorkshop.Models.PartModel>().Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Parts.First<CarWorkshop.Models.PartModel>().Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Parts.First<CarWorkshop.Models.PartModel>().TotalPrice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Parts)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalPrice)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-controller="Parts" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-controller="Parts" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-controller="Parts" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Services</h4>
+    <hr />
+    <p>
+        <a asp-action="Create" asp-controller="Tasks" asp-route-ticketId="@Model.Id">Add Service</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().Employee.FullName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().WorkTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().PricePerHour)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().TotalPrice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Tasks)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PricePerHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalPrice)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-controller="Tasks" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-controller="Tasks" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-controller="Tasks" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <hr />
+
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+        <a asp-action="Delete" asp-route-id="@Model.Id">Delete</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>

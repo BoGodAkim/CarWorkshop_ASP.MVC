@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using CarWorkshop.Areas.Identity.Data;
+using CarWorkshop.Models;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);

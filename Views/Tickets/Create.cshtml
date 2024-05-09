@@ -1,0 +1,104 @@
+@model CarWorkshop.Models.TicketModel
+
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Ticket</h4>
+<hr />
+<div class="row">
+    <div id="profile-form" class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="CarBrand" class="form-control" aria-required="true"
+                    placeholder="Please enter the car brand." />
+                <label asp-for="CarBrand" class="form-label"></label>
+                <span asp-validation-for="CarBrand" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="CarModel" class="form-control" aria-required="true"
+                    placeholder="Please enter the car model." />
+                <label asp-for="CarModel" class="form-label"></label>
+                <span asp-validation-for="CarModel" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Year" class="form-control" aria-required="true"
+                    placeholder="Please enter the car year." />
+                <label asp-for="Year" class="form-label"></label>
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="LicensePlate" class="form-control" aria-required="true"
+                    placeholder="Please enter the license plate." />
+                <label asp-for="LicensePlate" class="form-label"></label>
+                <span asp-validation-for="LicensePlate" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Description" class="form-control" aria-required="true"
+                    placeholder="Please enter the ticket description." />
+                <label asp-for="Description" class="form-label"></label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="PaidAmount" class="form-control" aria-required="true"
+                    placeholder="Please enter the paid amount." />
+                <label asp-for="PaidAmount" class="form-label"></label>
+                <span asp-validation-for="PaidAmount" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-for="TicketStatus" class="form-select" aria-required="true">
+                    <option value="">Select Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="InProgress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Canceled">Canceled</option>
+                </select>
+                <label asp-for="TicketStatus" class="form-label"></label>
+                <span asp-validation-for="TicketStatus" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Estimation.Description" class="form-control" aria-required="true"
+                    placeholder="Please enter the estimation description." />
+                <label asp-for="Estimation.Description" class="form-label"></label>
+                <span asp-validation-for="Estimation.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Estimation.Price" class="form-control" aria-required="true"
+                    placeholder="Please enter the estimation price." />
+                <label asp-for="Estimation.Price" class="form-label"></label>
+                <span asp-validation-for="Estimation.Price" class="text-danger"></span>
+            </div>
+
+            <div class="checkbox mb-3">
+                <label asp-for="Estimation.IsApproved" class="form-label">
+                    <input class="form-check-input" asp-for="Estimation.IsApproved" />
+                    @Html.DisplayNameFor(model => model.Estimation.IsApproved)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
