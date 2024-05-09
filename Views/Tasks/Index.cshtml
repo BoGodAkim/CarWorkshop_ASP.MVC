@@ -1,0 +1,85 @@
+@model IEnumerable<CarWorkshop.Models.TaskModel>
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+
+
+<h2>Tasks for Employee</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PricePerHour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ticket.CarBrand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ticket.CarModel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ticket.Year)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ticket.LicensePlate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ticket.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @string.Format("{0:dd/MM/yyyy HH:mm} - {1:dd/MM/yyyy HH:mm}", item.WorkTime.LowerBound,
+                             item.WorkTime.UpperBound)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PricePerHour)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ticket.CarBrand)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ticket.CarModel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ticket.Year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ticket.LicensePlate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ticket.Description)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

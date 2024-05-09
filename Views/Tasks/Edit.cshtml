@@ -1,0 +1,76 @@
+@model CarWorkshop.Models.TaskModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Task</h4>
+<hr />
+<div class="row">
+    <div id="profile-form" class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <!-- Show Model State Errors -->
+            <div class="text-danger">
+                <ul>
+                    @foreach (var modelState in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="TicketId" class="form-control" aria-required="true"
+                    placeholder="Please enter the ticket id." style="display: none;" />
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="EmployeeId" class="form-control" aria-required="true"
+                    placeholder="Please enter the ticket id." style="display: none;" />
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Description" class="form-control" aria-required="true"
+                    placeholder="Please enter the task description." />
+                <label asp-for="Description" class="form-label"></label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="WorkTime.LowerBound" class="form-control" aria-required="true" type="datetime-local"
+                    asp-format="{0:yyyy-MM-ddTHH}" placeholder="Please enter the task start time." />
+                <label asp-for="WorkTime.LowerBound" class="form-label"></label>
+                <span asp-validation-for="WorkTime.LowerBound" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="WorkTime.UpperBound" class="form-control" aria-required="true" type="datetime-local"
+                    asp-format="{0:yyyy-MM-ddTHH}" placeholder="Please enter the task end time." />
+                <label asp-for="WorkTime.UpperBound" class="form-label"></label>
+                <span asp-validation-for="WorkTime.UpperBound" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="PricePerHour" class="form-control" aria-required="true" type="number" step="0.01"
+                    placeholder="Please enter the task price per hour." />
+                <label asp-for="PricePerHour" class="form-label"></label>
+                <span asp-validation-for="PricePerHour" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Details" asp-controller="Tickets" asp-route-id="@Model.TicketId">Back to Ticket Details</a> |
+    <a asp-action="Index" asp-route-id="@Model.EmployeeId">Back to Employee Tasks</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

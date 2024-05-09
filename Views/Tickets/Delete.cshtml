@@ -124,9 +124,6 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().Employee.FullName)
-                </th>
-                <th>
                     @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().Description)
                 </th>
                 <th>
@@ -138,6 +135,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().TotalPrice)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tasks.First<CarWorkshop.Models.TaskModel>().Employee.FullName)
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -145,19 +145,20 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Employee.FullName)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.WorkTime)
+                        @string.Format("{0:dd/MM/yyyy HH:mm} - {1:dd/MM/yyyy HH:mm}", item.WorkTime.LowerBound,
+                                 item.WorkTime.UpperBound)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.PricePerHour)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.TotalPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee.FullName)
                     </td>
                 </tr>
             }

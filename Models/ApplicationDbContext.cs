@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -39,4 +40,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .ToTable("AspNetUsers");
         
     }
+
 }

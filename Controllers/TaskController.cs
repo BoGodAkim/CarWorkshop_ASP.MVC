@@ -7,35 +7,44 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using CarWorkshop.Models;
+using NpgsqlTypes;
 
 namespace CarWorkshop.Controllers
 {
-    public class TicketsController : Controller
+    public class TasksController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public TicketsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public TasksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
         }
 
-        // GET: Tickets
+        // GET: Tasks
         public async Task<IActionResult> Index()
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
             {
                 return RedirectToAction("Index", "Home");
             }
-            var Tickets = _context.Tickets
+
+            var EmployeeId = (await _userManager.GetUserAsync(User))!.Id;
+            var Tasks = _context.Tasks
+                .Where(c => c.EmployeeId == EmployeeId)
+                .OrderBy(c => c.WorkTime.LowerBound)
+                .Include(c => c.Employee)
+                .Include(c => c.Ticket)
                 .AsNoTracking();
-            return View(await Tickets.ToListAsync());
+            ViewBag.EmployeeId = EmployeeId;
+            return View(await Tasks.ToListAsync());
+
         }
 
-        // GET: Tickets/Details/5
+        // GET: Tasks/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
@@ -46,56 +55,93 @@ namespace CarWorkshop.Controllers
             {
                 return NotFound();
             }
-            // sort tasks by work time
-            var ticket = await _context.Tickets
-                .Include(c => c.Parts)
-                .Include(c => c.Tasks)
-                .ThenInclude(c => c.Employee)
+
+            var task = await _context.Tasks
+                .Include(c => c.Employee)
+                .Include(c => c.Ticket)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (task == null)
             {
                 return NotFound();
             }
-            ticket.Tasks = ticket.Tasks.OrderBy(t => t.WorkTime.LowerBound).ToList();
-            return View(ticket);
+
+            return View(task);
         }
 
-        // GET: Tickets/Create
-        public async Task<IActionResult> Create()
+        // GET: Tasks/Create
+        public async Task<IActionResult> Create(Guid? ticketId)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
             {
                 return RedirectToAction("Index", "Home");
             }
+            if (ticketId == null)
+            {
+                return NotFound();
+            }
+            ViewData["TicketId"] = ticketId;
+            var ticket = await _context.Tickets
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == ticketId);
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+            var employeeId = (await _userManager.GetUserAsync(User))!.Id;
+            ViewData["EmployeeId"] = employeeId;
             return View();
         }
 
-        // POST: Tickets/Create
+        // POST: Tasks/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CarBrand,CarModel,Year,LicensePlate,Description,PaidAmount,TicketStatus,Estimation")] TicketModel ticket)
+        public async Task<IActionResult> Create([Bind("Id,EmployeeId,TicketId,Description,WorkTime,PricePerHour")] TaskInputModel task)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
             {
                 return RedirectToAction("Index", "Home");
             }
             ModelState.Remove("Id");
-            ModelState.Remove("Parts");
-            ModelState.Remove("Tasks");
+            ModelState.Remove("Employee");
+            ModelState.Remove("Ticket");
+
+            ViewData["EmployeeId"] = task.EmployeeId;
+            ViewData["TicketId"] = task.TicketId;
+
+            TaskModel task1 = new TaskModel
+            {
+                Id = Guid.NewGuid(),
+                EmployeeId = task.EmployeeId,
+                TicketId = task.TicketId,
+                Description = task.Description,
+                WorkTime = new NpgsqlRange<DateTime>(task.WorkTime.LowerBound.ToUniversalTime(), task.WorkTime.UpperBound.ToUniversalTime()),
+                PricePerHour = task.PricePerHour,
+                Employee = task.Employee,
+                Ticket = task.Ticket
+            };
 
             if (ModelState.IsValid)
             {
-                _context.Add(ticket);
+                var tasks = _context.Tasks
+                    .Where(c => c.EmployeeId == task.EmployeeId && !c.WorkTime.Intersect(task1.WorkTime).IsEmpty)
+                    .AsNoTracking();
+                if (tasks.Any())
+                {
+                    ModelState.AddModelError("WorkTime", "The task intersects with another task");
+                    return View(task1);
+                }
+
+                _context.Add(task1);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(ticket);
+            return View(task1);
         }
 
-        // GET: Tickets/Edit/5
+        // GET: Tasks/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
@@ -107,22 +153,22 @@ namespace CarWorkshop.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            var task = await _context.Tasks
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (task == null)
             {
                 return NotFound();
             }
-            return View(ticket);
+            return View(task);
         }
 
-        // POST: Tickets/Edit/5
+        // POST: Tasks/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(Guid? id, [Bind("Id,CarBrand,CarModel,Year,LicensePlate,Description,PaidAmount,TicketStatus,Estimation")] TicketModel ticket)
+        public async Task<IActionResult> EditPost(Guid? id, [Bind("Id,EmployeeId,TicketId,Description,WorkTime,PricePerHour")] TaskInputModel task)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
             {
@@ -133,28 +179,49 @@ namespace CarWorkshop.Controllers
                 return NotFound();
             }
 
-            ModelState.Remove("Parts");
-            ModelState.Remove("Tasks");
+            ModelState.Remove("Employee");
+            ModelState.Remove("Ticket");
+
+            TaskModel task1 = new TaskModel
+            {
+                Id = task.Id,
+                EmployeeId = task.EmployeeId,
+                TicketId = task.TicketId,
+                Description = task.Description,
+                WorkTime = new NpgsqlRange<DateTime>(task.WorkTime.LowerBound.ToUniversalTime(), task.WorkTime.UpperBound.ToUniversalTime()),
+                PricePerHour = task.PricePerHour,
+                Employee = task.Employee,
+                Ticket = task.Ticket
+            };
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(ticket);
+                    var tasks = _context.Tasks
+                        .Where(c => c.EmployeeId == task.EmployeeId && !c.WorkTime.Intersect(task1.WorkTime).IsEmpty)
+                        .AsNoTracking();
+                    if (tasks.Any())
+                    {
+                        ModelState.AddModelError("WorkTime", "The task intersects with another task");
+                        return View(task1);
+                    }
+
+                    _context.Update(task1);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException /* ex */)
+                catch (DbUpdateConcurrencyException)
                 {
-                    //Log the error (uncomment ex variable name and write a log.)
                     ModelState.AddModelError("", "Unable to save changes. " +
                         "Try again, and if the problem persists, " +
                         "see your system administrator.");
                 }
+                return RedirectToAction(nameof(Index));
             }
-            return View(ticket);
+            return View(task1);
         }
 
-        // GET: Tickets/Delete/5
+        // GET: Tasks/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (!_signInManager.IsSignedIn(User) || !((await _userManager.GetUserAsync(User))?.Type == ApplicationUser.UserType.Employee))
@@ -166,23 +233,20 @@ namespace CarWorkshop.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
-                .Include(c => c.Parts)
-                .Include(c => c.Tasks)
-                .ThenInclude(c => c.Employee)
+            var task = await _context.Tasks
+                .Include(c => c.Ticket)
+                .Include(c => c.Employee)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (task == null)
             {
                 return NotFound();
             }
 
-            ticket.Tasks = ticket.Tasks.OrderBy(t => t.WorkTime.LowerBound).ToList();
-
-            return View(ticket);
+            return View(task);
         }
 
-        // POST: Tickets/Delete/5
+        // POST: Tasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
@@ -191,19 +255,19 @@ namespace CarWorkshop.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
             {
                 return RedirectToAction(nameof(Index));
             }
-            _context.Tickets.Remove(ticket);
+            _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TicketExists(Guid id)
+        private bool TaskExists(Guid id)
         {
-            return _context.Tickets.Any(e => e.Id == id);
+            return _context.Tasks.Any(e => e.Id == id);
         }
     }
 }
